@@ -1,0 +1,15 @@
+services:
+  gallery:
+    build: .
+    container_name: immich-static-gallery
+    environment:
+      - NODE_ENV=production
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}  # Optional, from your .env file
+      - CLOUDFLARE_ACCOUNT_ID=${CLOUDFLARE_ACCOUNT_ID}  # Optional, from your .env file
+      - IMMICH_API_KEY=${IMMICH_API_KEY}  # Optional, from your .env file
+      - IMMICH_SERVER=${IMMICH_SERVER}  # Optional, from your .env file
+    volumes:
+      - ./config.yaml:/app/config.yaml                 # Your config file
+      - ./cache:/app/cache  # Directory for cache files
+      - ./data:/app/data                           # Output folder with contentDir and publicDir
+    command: ["node", "bin/sync.js", "watch", "--config", "config.yaml"]

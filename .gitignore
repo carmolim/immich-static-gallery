@@ -1,0 +1,9 @@
+node_modules
+.env
+.cache
+dist
+public
+content
+*.log
+config.yaml
+data

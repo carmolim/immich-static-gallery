@@ -1,0 +1,30 @@
+albums:
+  - id: "album-uuid-from-immich"
+    slug: "family-vacation"
+    title: "Family Vacation"
+
+scan:
+  intervalMinutes: 60
+
+output:
+  contentDir: "./data/temp"
+  publicDir: "./data/public"
+
+gallery:
+  engine: "thumbsup"
+  flags:
+    - "--theme"
+    - "cards"
+    - "--title"
+    - "Gallery"
+    - "--cleanup"
+    - "true"
+    - "--sort-media-direction"
+    - "desc"
+
+deploy:
+  method: "cloudflare"  # or "github" or null
+  cloudflare:
+    projectName: "static-immich"
+
+cacheFile: "cache/cache.json"
