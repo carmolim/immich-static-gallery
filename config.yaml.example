@@ -6,9 +6,6 @@ albums:
 scan:
   intervalMinutes: 60
 
-output:
-  contentDir: "./data/temp"
-  publicDir: "./data/public"
 
 gallery:
   engine: "thumbsup"
@@ -23,8 +20,6 @@ gallery:
     - "desc"
 
 deploy:
-  method: "cloudflare"  # or "github" or null
+  method: cloudflare
   cloudflare:
     projectName: "static-immich"
-
-cacheFile: "cache/cache.json"

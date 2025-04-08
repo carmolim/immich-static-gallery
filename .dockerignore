@@ -1,6 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Node
 node_modules
-dist
-.cache
-.env
-.DS_Store
+npm-debug.log
 *.log
+
+# Build artifacts
+dist
+build
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Config/Secrets
+.env
+config.yaml
+
+# Cache/Output (handled by volumes)
+cache/
+*.tmp
+/data
+
+# Docker
+Dockerfile
+docker-compose.yml

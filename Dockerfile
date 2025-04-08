@@ -1,29 +1,40 @@
 # -------------------------------------------------
-# Multi-stage build for production
+# Stage 1: Builder
+# Install ALL dependencies (including dev) needed for potential native module builds
 # -------------------------------------------------
-
-# Stage 1: Builder (based on thumbsup's approach)
 FROM node:18-alpine AS builder
 
-# Install build tools
-RUN apk add --no-cache git make g++ python3
+# Install build tools and necessary dev libraries for native modules
+# Use --virtual to easily remove build deps later if needed within this stage
+RUN apk add --no-cache --virtual .build-deps \
+    git \
+    python3 \
+    make \
+    g++
 
 WORKDIR /app
 
-# Install app dependencies first for better caching
+# Copy package files
 COPY package.json package-lock.json ./
+
+# Install ALL npm dependencies (including devDeps needed for potential builds)
 RUN npm ci
 
-# Copy app source
+# Copy the rest of the application source code
+# Ensure .dockerignore prevents copying unnecessary files like local node_modules
 COPY . .
 
-# Stage 2: Runtime image (optimized)
+# Optional: If you had a build step (e.g., tsc, webpack), run it here
+# RUN npm run build
+
+# -------------------------------------------------
+# Stage 2: Production Runtime
+# Use a small base image and copy only necessary artifacts
+# -------------------------------------------------
 FROM node:18-alpine
 
-# Metadata
-LABEL maintainer="Your Name <your.email@example.com>"
-
-# Install runtime dependencies with architecture checks
+# Install ONLY essential runtime dependencies from Alpine packages
+# Use non -dev versions (e.g., libheif instead of libheif-dev)
 RUN apk add --no-cache \
     ffmpeg \
     imagemagick \
@@ -33,30 +44,27 @@ RUN apk add --no-cache \
     zip \
     libheif \
     libde265 \
-    x265 \
-    dcraw \
-    libgomp \
-    zlib \
-    libpng \
-    libjpeg-turbo \
-    libwebp \
-    tiff \
-    lcms2 \
-    && if [ "$(uname -m)" = "x86_64" ]; then \
-         apk add --no-cache intel-media-driver; \
-       fi \
-    && sed -i '/pattern="HEIC"/d' /etc/ImageMagick-7/policy.xml \
-    && ln -s $(which convert) /usr/local/bin/magick
-
-# Copy built application from builder
-COPY --from=builder /app /app
-
-# Install global packages separately
-RUN npm install -g thumbsup wrangler
-
-# Use tini as init process
-RUN apk add --no-cache tini
-ENTRYPOINT ["tini", "-g", "--"]
+    tini \
+    && rm -rf /var/cache/apk/*
 
 WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package.json package-lock.json ./
+
+# Install ONLY production npm dependencies
+RUN npm ci --omit=dev
+
+# Install global dependencies needed at runtime AFTER production deps are installed
+# This keeps layers slightly more logical, though size impact is minimal
+RUN npm install -g thumbsup wrangler
+
+# Copy application code (excluding node_modules) from the builder stage
+# This ensures we get the source code without the devDependencies from the builder's node_modules
+COPY --from=builder /app /app
+
+# Set Tini as the entrypoint for proper signal handling & zombie reaping
+ENTRYPOINT ["tini", "-g", "--"]
+
+# Default command to run the application
 CMD ["npm", "run", "start"]

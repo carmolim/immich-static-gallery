@@ -27,10 +27,9 @@ program
 program.parse(process.argv)
 
 const [mode] = program.args
-const { config: configPath } = program.opts()
 
 async function build(cfg, db) {
-  const contentRoot = cfg.output.contentDir
+  const contentRoot = cfg.paths.contentDir
   let changed = false
 
   // ── 0) Remove any album folder no longer in config ──────────────
@@ -102,18 +101,18 @@ async function build(cfg, db) {
   if (changed) {
     await buildGallery({
       contentDir: contentRoot,
-      publicDir: cfg.output.publicDir,
+      publicDir: cfg.paths.publicDir,
       flags: cfg.gallery.flags,
     })
-    await deploy(cfg, cfg.output.publicDir)
+    await deploy(cfg, cfg.paths.publicDir)
   } else {
     console.log("No changes detected; skipping build/deploy.")
   }
 }
 
 async function main() {
-  const cfg = loadConfig(configPath)
-  const db = await createCache(cfg.cacheFile)
+  const cfg = loadConfig()
+  const db = await createCache(cfg.paths.cacheFile)
 
   if (mode === "once") {
     await build(cfg, db)

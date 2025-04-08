@@ -7,3 +7,4 @@ content
 *.log
 config.yaml
 data
+cache/
