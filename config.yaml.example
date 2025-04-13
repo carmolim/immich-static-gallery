@@ -23,3 +23,8 @@ deploy:
   method: cloudflare
   cloudflare:
     projectName: "static-immich"
+
+# Optional: Send a notification when the gallery is updated
+notify:
+  # URL to send a POST request to when changes are detected
+  webhookUrl: ""

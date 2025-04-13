@@ -69,6 +69,11 @@ deploy:
   cloudflare:
     # Requires CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN in .env
     projectName: "your-cloudflare-pages-project-name"
+
+# Optional: Notify a webhook when the gallery is updated
+notify:
+  # URL to send a POST request to. Leave empty to disable.
+  webhookUrl: "https://your-webhook-endpoint.com/notify"
 ```
 
 ### 3. Create your `.env` file

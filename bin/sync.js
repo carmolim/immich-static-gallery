@@ -9,6 +9,7 @@ import { createClient } from "../lib/api.js"
 import { downloadAssets } from "../lib/downloader.js"
 import { buildGallery } from "../lib/gallery.js"
 import { deploy } from "../lib/deploy.js"
+import { sendNotification } from "../lib/notify.js"
 import dotenv from "dotenv"
 
 dotenv.config()
@@ -105,6 +106,11 @@ async function build(cfg, db) {
       flags: cfg.gallery.flags,
     })
     await deploy(cfg, cfg.paths.publicDir)
+
+    // Send notification if webhook is configured
+    if (cfg.notify?.webhookUrl) {
+      await sendNotification(cfg.notify.webhookUrl);
+    }
   } else {
     console.log("No changes detected; skipping build/deploy.")
   }
