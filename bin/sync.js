@@ -61,7 +61,9 @@ async function build(cfg, db) {
 
     // fetch current assets
     const allAssets = await client.listAssets(album.id)
+    
     const currentIds = allAssets.map((a) => a.id)
+    
 
     // load previously seen IDs
     const seenIds = getSeenIds(db, album.id)
