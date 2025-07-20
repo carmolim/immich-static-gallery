@@ -2,7 +2,7 @@
 # Stage 1: Builder
 # Install ALL dependencies (including dev) needed for potential native module builds
 # -------------------------------------------------
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Install build tools and necessary dev libraries for native modules
 # Use --virtual to easily remove build deps later if needed within this stage
@@ -31,7 +31,7 @@ COPY . .
 # Stage 2: Production Runtime
 # Use a small base image and copy only necessary artifacts
 # -------------------------------------------------
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Install ONLY essential runtime dependencies from Alpine packages
 # Use non -dev versions (e.g., libheif instead of libheif-dev)
